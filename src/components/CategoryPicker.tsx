@@ -66,7 +66,7 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({ config, onChange
       </div>
 
       {/* Category Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         {CATEGORIES.map((cat) => {
           const IconComp = CATEGORY_ICONS[cat.iconName] || Sparkles;
           const isSelected = config.category === cat.id;

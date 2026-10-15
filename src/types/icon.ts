@@ -59,9 +59,12 @@ export interface IconConfig {
   bgStyle: BackgroundStyle;
   platformMask: PlatformMask;
   customDirectives: string;
-  engine: 'gemini' | 'dall-e-3';
+  engine: 'gemini' | 'dall-e-3' | 'microsoft-foundry';
   geminiApiKey?: string;
   openaiApiKey?: string;
+  azureFoundryApiKey?: string;
+  azureFoundryEndpoint?: string;
+  azureDeployment?: string;
 }
 
 export interface PlatformSize {

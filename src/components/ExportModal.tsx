@@ -76,10 +76,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-      <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md p-3 sm:p-6 flex items-start sm:items-center justify-center animate-fade-in">
+      <div className="relative w-full max-w-4xl my-auto bg-slate-900 border border-slate-700 rounded-2xl sm:rounded-3xl max-h-[calc(100vh-2rem)] sm:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Modal Top Bar */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div className="px-5 sm:px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/80">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
               <FolderArchive className="w-5 h-5" />

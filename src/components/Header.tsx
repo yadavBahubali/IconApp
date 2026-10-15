@@ -129,44 +129,46 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* API Key & Engine Modal */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-6 flex items-start sm:items-center justify-center animate-fade-in">
+          <div className="relative w-full max-w-lg my-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[90vh] overflow-hidden">
+            {/* Modal Header - Always Visible */}
+            <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/90">
               <div className="flex items-center gap-2">
-                <Key className="w-5 h-5 text-amber-400" />
+                <Key className="w-5 h-5 text-amber-400 shrink-0" />
                 <div>
-                  <h3 className="text-base font-semibold text-white">Temporary Session API Key</h3>
-                  <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
-                    <Lock className="w-3 h-3" /> Auto-removed on app / tab close (zero disk storage)
+                  <h3 className="text-sm sm:text-base font-semibold text-white">Temporary Session API Key</h3>
+                  <span className="text-[10px] sm:text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                    <Lock className="w-3 h-3 shrink-0" /> Auto-removed on app / tab close (zero disk storage)
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setShowSettings(false)}
-                className="text-slate-400 hover:text-white text-sm px-2 py-1"
+                className="text-slate-400 hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-800 transition"
               >
                 ✕
               </button>
             </div>
 
-            {/* Privacy Guarantee Box */}
-            <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-emerald-300">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Zero Permanent Storage Guarantee</span>
+            {/* Modal Body - Scrollable if screen is short */}
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
+              {/* Privacy Guarantee Box */}
+              <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-emerald-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Zero Permanent Storage Guarantee</span>
+                </div>
+                <p className="text-[11px] text-emerald-300/80 leading-relaxed">
+                  Your keys remain strictly in volatile RAM memory while this browser tab is running. As soon as you close or reload the app, they are completely wiped. They are never written to localStorage, cookies, or saved on any server disk.
+                </p>
               </div>
-              <p className="text-[11px] text-emerald-300/80 leading-relaxed">
-                Your keys remain strictly in volatile RAM memory while this browser tab is running. As soon as you close or reload the app, they are completely wiped. They are never written to localStorage, cookies, or saved on any server disk.
-              </p>
-            </div>
 
-            <div className="space-y-4">
               {/* Engine Selector */}
               <div>
-                <label className="text-xs font-medium text-slate-300 block mb-2">
+                <label className="text-xs font-medium text-slate-300 block mb-1.5">
                   Active Image Generation Engine:
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => onChangeConfig({ engine: 'gemini' })}
@@ -177,8 +179,8 @@ export const Header: React.FC<HeaderProps> = ({
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold">Gemini 3.1</span>
-                      {config.engine === 'gemini' && <Check className="w-4 h-4 text-orange-400" />}
+                      <span className="text-xs sm:text-sm font-semibold">Gemini 3.1</span>
+                      {config.engine === 'gemini' && <Check className="w-4 h-4 text-orange-400 shrink-0" />}
                     </div>
                     <p className="text-[11px] text-slate-400 leading-tight">
                       Google Studio Image Model (Fast 1:1 Icon Synthesizer)
@@ -195,8 +197,8 @@ export const Header: React.FC<HeaderProps> = ({
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold">OpenAI DALL·E 3</span>
-                      {config.engine === 'dall-e-3' && <Check className="w-4 h-4 text-orange-400" />}
+                      <span className="text-xs sm:text-sm font-semibold">OpenAI DALL·E 3</span>
+                      {config.engine === 'dall-e-3' && <Check className="w-4 h-4 text-orange-400 shrink-0" />}
                     </div>
                     <p className="text-[11px] text-slate-400 leading-tight">
                       OpenAI 1024×1024 Icon API (requires OpenAI Key)
@@ -256,29 +258,30 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* Modal Actions */}
-            <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+            {/* Modal Footer - Always Visible */}
+            <div className="px-5 py-3.5 border-t border-slate-800 bg-slate-950/90 flex items-center justify-between shrink-0">
               <button
                 type="button"
                 onClick={handleClearKeys}
-                className="px-3 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                className="px-3 py-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Clear & Erase Now</span>
+                <span className="hidden sm:inline">Clear & Erase Now</span>
+                <span className="sm:hidden">Clear</span>
               </button>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setShowSettings(false)}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition"
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleApplyKeys}
-                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg shadow-md transition flex items-center gap-1.5"
+                  className="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg shadow-md transition flex items-center gap-1.5"
                 >
                   <Check className="w-4 h-4" />
                   <span>Apply for Session</span>
@@ -288,27 +291,28 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       )}
+
       {/* Architecture Info Modal */}
       {showInfo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-6 flex items-start sm:items-center justify-center animate-fade-in">
+          <div className="relative w-full max-w-2xl my-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[85vh] overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/90">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-orange-400" />
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-sm sm:text-base font-semibold text-white">
                   Icon Generator Blueprint Architecture
                 </h3>
               </div>
               <button
                 onClick={() => setShowInfo(false)}
-                className="text-slate-400 hover:text-white text-sm px-2 py-1"
+                className="text-slate-400 hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-800 transition"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-4 text-xs text-slate-300 leading-relaxed">
-              <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
+            <div className="p-5 overflow-y-auto flex-1 space-y-3.5 text-xs text-slate-300 leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
                 <h4 className="font-semibold text-orange-400 mb-1">
                   1. The User Interface (The "Ask")
                 </h4>
@@ -317,7 +321,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
+              <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
                 <h4 className="font-semibold text-orange-400 mb-1">
                   2. The Logic (The "Prompt Builder")
                 </h4>
@@ -326,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
+              <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
                 <h4 className="font-semibold text-orange-400 mb-1">
                   3. Multi-Platform Output & Auto-Resizing
                 </h4>
@@ -335,7 +339,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
+              <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60">
                 <h4 className="font-semibold text-orange-400 mb-1">
                   4. Vectorization (SVG Output)
                 </h4>
@@ -345,7 +349,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            <div className="pt-2 flex justify-end">
+            <div className="px-5 py-3.5 border-t border-slate-800 bg-slate-950/90 flex justify-end shrink-0">
               <button
                 onClick={() => setShowInfo(false)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition"

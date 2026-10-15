@@ -31,7 +31,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({ config, onChangeCo
       </div>
 
       {/* Primary 4 Styles Grid (Blueprint Required) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {coreStyles.map((style) => {
           const isSelected = config.style === style.id;
 
@@ -40,7 +40,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({ config, onChangeCo
               key={style.id}
               type="button"
               onClick={() => onChangeConfig({ style: style.id })}
-              className={`group relative p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all duration-200 overflow-hidden ${
+              className={`group relative p-2.5 sm:p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all duration-200 overflow-hidden ${
                 isSelected
                   ? 'border-orange-500 bg-orange-500/10 ring-2 ring-orange-500/40 shadow-lg shadow-orange-500/10'
                   : 'border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-850'
@@ -48,7 +48,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({ config, onChangeCo
             >
               {/* Visual Preview Banner */}
               <div
-                className={`w-full h-24 rounded-xl bg-gradient-to-br ${style.previewGradient} flex items-center justify-center mb-3 relative overflow-hidden shadow-inner`}
+                className={`w-full h-16 sm:h-20 rounded-xl bg-gradient-to-br ${style.previewGradient} flex items-center justify-center mb-2 sm:mb-3 relative overflow-hidden shadow-inner`}
               >
                 {/* Visual Style Representation Graphic */}
                 {style.id === 'flat' && (

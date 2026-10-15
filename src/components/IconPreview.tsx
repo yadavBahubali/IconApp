@@ -130,7 +130,7 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
 
       {/* Main Viewport Stage */}
       <div
-        className={`flex-1 min-h-[320px] sm:min-h-[400px] flex items-center justify-center p-8 relative overflow-hidden transition-colors ${
+        className={`flex-1 min-h-[260px] sm:min-h-[340px] md:min-h-[380px] flex items-center justify-center p-4 sm:p-8 relative overflow-hidden transition-colors ${
           showCheckerboard
             ? 'bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] bg-slate-950'
             : 'bg-slate-950'
@@ -138,7 +138,7 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
       >
         {/* Glow backdrop behind icon */}
         <div
-          className="absolute w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none transition-all duration-700"
+          className="absolute w-60 h-60 sm:w-72 sm:h-72 rounded-full opacity-20 blur-3xl pointer-events-none transition-all duration-700"
           style={{
             backgroundColor: config.primaryColor || '#f97316',
           }}
@@ -153,7 +153,7 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
             <div className="relative group">
               {/* Outer Shadow for 3D elevation */}
               <div
-                className={`w-64 h-64 sm:w-72 sm:h-72 overflow-hidden shadow-2xl transition-all duration-300 relative border border-white/10 ${getMaskClass(
+                className={`w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 overflow-hidden shadow-2xl transition-all duration-300 relative border border-white/10 ${getMaskClass(
                   config.platformMask
                 )}`}
                 style={{
@@ -171,15 +171,15 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
               </div>
 
               {/* Floating resolution tag */}
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[10px] font-mono text-slate-300 shadow-md">
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[10px] font-mono text-slate-300 shadow-md whitespace-nowrap">
                 {config.platformMask.toUpperCase()} MASK
               </div>
             </div>
           ) : (
-            <div className="w-64 h-64 rounded-3xl border-2 border-dashed border-slate-800 flex flex-col items-center justify-center text-center p-6 text-slate-500">
-              <Layers className="w-12 h-12 mb-3 text-slate-600 animate-pulse" />
-              <p className="text-sm font-semibold text-slate-400">Ready to synthesize</p>
-              <p className="text-xs text-slate-500 mt-1">
+            <div className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 rounded-3xl border-2 border-dashed border-slate-800 flex flex-col items-center justify-center text-center p-4 sm:p-6 text-slate-500">
+              <Layers className="w-10 h-10 sm:w-12 sm:h-12 mb-3 text-slate-600 animate-pulse" />
+              <p className="text-xs sm:text-sm font-semibold text-slate-400">Ready to synthesize</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-1">
                 Configure your presets and hit "Generate App Icon"
               </p>
             </div>
@@ -188,16 +188,16 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
           {/* Loading Overlay */}
           {isGenerating && (
             <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center text-center p-6 border border-orange-500/40 z-20 animate-fade-in">
-              <div className="relative w-16 h-16 mb-4">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-4">
                 <div className="absolute inset-0 rounded-2xl bg-orange-500/20 animate-ping" />
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
-                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                  <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 text-white animate-spin" />
                 </div>
               </div>
-              <p className="text-sm font-bold text-white tracking-wide">
+              <p className="text-xs sm:text-sm font-bold text-white tracking-wide">
                 Synthesizing App Icon...
               </p>
-              <p className="text-xs text-orange-400 font-mono mt-1">
+              <p className="text-[11px] sm:text-xs text-orange-400 font-mono mt-1">
                 Applying secret prompt formula
               </p>
             </div>
@@ -214,11 +214,11 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
       )}
 
       {/* Shape Quick Switcher */}
-      <div className="px-5 py-2.5 border-t border-slate-800/80 bg-slate-900 flex items-center justify-between text-xs">
-        <span className="text-slate-400 text-[11px] font-medium hidden sm:inline">
+      <div className="px-4 sm:px-5 py-2.5 border-t border-slate-800/80 bg-slate-900 flex items-center justify-between text-xs">
+        <span className="text-slate-400 text-[11px] font-medium hidden md:inline">
           Preview Mask:
         </span>
-        <div className="flex items-center gap-1 w-full sm:w-auto justify-between sm:justify-end">
+        <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 justify-start sm:justify-end scrollbar-none">
           <button
             type="button"
             onClick={() => onChangeMask('ios')}
