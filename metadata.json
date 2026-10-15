@@ -1,0 +1,6 @@
+{
+  "name": "App Icon Studio - AI Icon Generator & Asset Exporter",
+  "description": "Generate professional app icons with style presets, secret prompt synthesis, iOS & Android asset pack exporter, and vector SVG generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
