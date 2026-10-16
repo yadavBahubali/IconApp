@@ -122,7 +122,7 @@ export async function generateIconPackZip(
   // Add README integration instructions
   const readme = `# ${appName} - Multi-Platform App Icon Pack
 
-Generated with App Icon Studio.
+Generated with App Icon Studio — Developed by Kuldeep Yadav.
 
 ## Included Directories:
 - **/ios/**: iOS Xcode AppIcon assets (iPhone, iPad, App Store 1024x1024) and Contents.json

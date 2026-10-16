@@ -13,6 +13,8 @@ import { IconPreview } from './components/IconPreview';
 import { MockupShowcase } from './components/MockupShowcase';
 import { ExportModal } from './components/ExportModal';
 import { HistoryDrawer } from './components/HistoryDrawer';
+import { SettingsModal } from './components/SettingsModal';
+import { ArchitectureInfoModal } from './components/ArchitectureInfoModal';
 import { GeneratedIcon, IconConfig, PlatformMask } from './types/icon';
 import { buildSecretPrompt } from './utils/promptBuilder';
 import { DEFAULT_SAMPLE_ICONS } from './utils/sampleIcons';
@@ -63,6 +65,8 @@ export default function App() {
   const [isVectorizing, setIsVectorizing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const [zipProgress, setZipProgress] = useState<{
     percent: number;
     task: string;
@@ -82,7 +86,9 @@ export default function App() {
     setConfig((prev) => ({ ...prev, ...newConfig }));
   };
 
-  // Convert current active icon to SVG vector
+  const [mobileTab, setMobileTab] = useState<'presets' | 'preview'>('presets');
+
+  // Vectorize helper
   const handleVectorize = async (imgUrl: string): Promise<string> => {
     try {
       setIsVectorizing(true);
@@ -102,6 +108,8 @@ export default function App() {
   const handleGenerate = async () => {
     setGenerationError(null);
     setIsGenerating(true);
+    // On mobile devices, switch tab to preview immediately
+    setMobileTab('preview');
 
     const secretPrompt = buildSecretPrompt(config);
     const appName = config.customSubject
@@ -117,6 +125,9 @@ export default function App() {
           engine: config.engine,
           openaiApiKey: config.openaiApiKey,
           geminiApiKey: config.geminiApiKey,
+          azureFoundryApiKey: config.azureFoundryApiKey,
+          azureFoundryEndpoint: config.azureFoundryEndpoint,
+          azureDeployment: config.azureDeployment,
         }),
       });
 
@@ -131,6 +142,9 @@ export default function App() {
         ...config,
         geminiApiKey: undefined,
         openaiApiKey: undefined,
+        azureFoundryApiKey: undefined,
+        azureFoundryEndpoint: undefined,
+        azureDeployment: undefined,
       };
 
       const newIcon: GeneratedIcon = {
@@ -289,8 +303,9 @@ export default function App() {
       <Header
         historyCount={history.length}
         onOpenHistory={() => setShowHistoryDrawer(true)}
+        onOpenSettings={() => setShowSettingsModal(true)}
+        onOpenInfo={() => setShowInfoModal(true)}
         config={config}
-        onChangeConfig={handleUpdateConfig}
       />
 
       {/* Main Studio Workspace */}
@@ -316,12 +331,43 @@ export default function App() {
           <div className="absolute right-40 -bottom-20 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
         </div>
 
+        {/* Mobile & Tablet View Switcher */}
+        <div className="flex lg:hidden items-center p-1 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <button
+            type="button"
+            onClick={() => setMobileTab('presets')}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+              mobileTab === 'presets'
+                ? 'bg-orange-500 text-white shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>1. Presets & Logic</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('preview')}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+              mobileTab === 'preview'
+                ? 'bg-orange-500 text-white shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>2. Studio Preview & Export</span>
+            {activeIcon && <span className="w-2 h-2 rounded-full bg-emerald-400" />}
+          </button>
+        </div>
+
         {/* 2-Column Studio Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: The Ask & The Logic (Steps 1, 2, 3, Secret Prompt) */}
-          <div className="lg:col-span-7 space-y-6">
+          <div
+            className={`lg:col-span-7 space-y-6 ${
+              mobileTab === 'presets' ? 'block' : 'hidden lg:block'
+            }`}
+          >
             {/* Step 1: Category & Subject */}
-            <div className="p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
+            <div className="p-4 sm:p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
               <CategoryPicker
                 config={config}
                 onChangeConfig={handleUpdateConfig}
@@ -329,7 +375,7 @@ export default function App() {
             </div>
 
             {/* Step 2: Style Selection */}
-            <div className="p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
+            <div className="p-4 sm:p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
               <StyleSelector
                 config={config}
                 onChangeConfig={handleUpdateConfig}
@@ -337,7 +383,7 @@ export default function App() {
             </div>
 
             {/* Step 3: Colors & Platform Mask */}
-            <div className="p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
+            <div className="p-4 sm:p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
               <ColorPicker
                 config={config}
                 onChangeConfig={handleUpdateConfig}
@@ -352,7 +398,11 @@ export default function App() {
           </div>
 
           {/* Right Column: Preview, Actions & Mockups */}
-          <div className="lg:col-span-5 space-y-6 sticky top-20">
+          <div
+            className={`lg:col-span-5 space-y-6 ${
+              mobileTab === 'preview' ? 'block' : 'hidden lg:block'
+            }`}
+          >
             {/* Master Studio Preview & Output Buttons */}
             <IconPreview
               activeIcon={activeIcon}
@@ -375,6 +425,20 @@ export default function App() {
           </div>
         </div>
       </main>
+
+      {/* Settings Modal (Engine & Session API Keys) - Rendered Openly on Page */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        config={config}
+        onChangeConfig={handleUpdateConfig}
+      />
+
+      {/* Blueprint Architecture Info Modal - Rendered Openly on Page */}
+      <ArchitectureInfoModal
+        isOpen={showInfoModal}
+        onClose={() => setShowInfoModal(false)}
+      />
 
       {/* Export Asset Modal */}
       <ExportModal
@@ -400,6 +464,9 @@ export default function App() {
             ...icon.config,
             geminiApiKey: prev.geminiApiKey,
             openaiApiKey: prev.openaiApiKey,
+            azureFoundryApiKey: prev.azureFoundryApiKey,
+            azureFoundryEndpoint: prev.azureFoundryEndpoint,
+            azureDeployment: prev.azureDeployment,
           }));
           handleVectorize(icon.imageUrl);
         }}
@@ -407,18 +474,27 @@ export default function App() {
         onClearHistory={handleClearHistory}
       />
 
-      {/* Footer */}
+      {/* Footer with Developer Attribution */}
       <footer className="border-t border-slate-800/80 bg-slate-950 py-6 mt-12 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© 2026 App Icon Studio. Built for iOS, Android, Windows & Web.</p>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>Xcode Asset Catalogs</span>
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+            <p className="font-semibold text-slate-300">
+              © 2026 App Icon Studio
+            </p>
+            <span className="hidden sm:inline text-slate-600">•</span>
+            <p className="text-orange-400 font-medium">
+              Developed by <strong className="text-white font-bold">Kuldeep Yadav</strong>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+            <span>Xcode Assets</span>
             <span>•</span>
             <span>Android Mipmaps</span>
             <span>•</span>
-            <span>PWA Manifest</span>
-            <span>•</span>
             <span>Vector SVG</span>
+            <span>•</span>
+            <span className="text-emerald-400">PWA Ready</span>
           </div>
         </div>
       </footer>

@@ -34,14 +34,88 @@ app.post('/api/generate-icon', async (req, res) => {
   try {
     const {
       prompt,
-      engine = 'gemini', // 'gemini' | 'dall-e-3'
+      engine = 'gemini', // 'gemini' | 'dall-e-3' | 'microsoft-foundry'
       openaiApiKey = '',
       geminiApiKey = '',
+      azureFoundryApiKey = '',
+      azureFoundryEndpoint = '',
+      azureDeployment = 'dall-e-3',
     } = req.body;
 
     if (!prompt || typeof prompt !== 'string') {
       res.status(400).json({ error: 'A prompt string is required' });
       return;
+    }
+
+    // 1. Microsoft AI Foundry Flow
+    if (engine === 'microsoft-foundry' || azureFoundryApiKey) {
+      const keyToUse =
+        azureFoundryApiKey ||
+        process.env.AZURE_FOUNDRY_API_KEY ||
+        process.env.AZURE_OPENAI_API_KEY;
+      const rawEndpoint =
+        azureFoundryEndpoint ||
+        process.env.AZURE_FOUNDRY_ENDPOINT ||
+        process.env.AZURE_OPENAI_ENDPOINT;
+      const deploymentName = azureDeployment || 'dall-e-3';
+
+      if (!keyToUse || !rawEndpoint) {
+        res.status(400).json({
+          error:
+            'Microsoft AI Foundry requires both an API Key and an Endpoint URL (e.g. https://your-resource.openai.azure.com).',
+        });
+        return;
+      }
+
+      const cleanEndpoint = rawEndpoint.replace(/\/+$/, '');
+      const requestUrl = cleanEndpoint.includes('/openai/deployments')
+        ? cleanEndpoint
+        : `${cleanEndpoint}/openai/deployments/${deploymentName}/images/generations?api-version=2024-02-01`;
+
+      const foundryRes = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': keyToUse,
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          n: 1,
+          size: '1024x1024',
+          response_format: 'b64_json',
+        }),
+      });
+
+      if (!foundryRes.ok) {
+        const errData = await foundryRes.json().catch(() => ({}));
+        res.status(foundryRes.status).json({
+          error:
+            errData?.error?.message ||
+            `Microsoft AI Foundry returned status ${foundryRes.status}. Please check your Endpoint, Deployment name, and API key.`,
+        });
+        return;
+      }
+
+      const data = await foundryRes.json();
+      const b64 = data.data?.[0]?.b64_json;
+      const directUrl = data.data?.[0]?.url;
+      if (b64) {
+        res.json({
+          success: true,
+          imageUrl: `data:image/png;base64,${b64}`,
+          engine: 'microsoft-foundry',
+          promptUsed: prompt,
+        });
+        return;
+      } else if (directUrl) {
+        res.json({
+          success: true,
+          imageUrl: directUrl,
+          engine: 'microsoft-foundry',
+          promptUsed: prompt,
+        });
+        return;
+      }
     }
 
     // 1. OpenAI DALL-E 3 Flow (if requested or user key provided)
