@@ -119,6 +119,19 @@ export const PromptInspector: React.FC<PromptInspectorProps> = ({ config, onChan
                 no text, no typography, no watermarks, isolated
               </span>
             </div>
+
+            {config.brandLogo && (config.brandLogo.companyName || config.brandLogo.logoDataUrl) && (
+              <div className="p-2.5 rounded-lg bg-orange-950/20 border border-orange-500/30 text-[11px] sm:col-span-2">
+                <span className="text-orange-400 block font-semibold mb-0.5">
+                  Brand Conditioning Active
+                </span>
+                <span className="text-white font-medium">
+                  {config.brandLogo.companyName ? `"${config.brandLogo.companyName}" • ` : ''}
+                  Mode: {config.brandLogo.mode.toUpperCase()}
+                  {config.brandLogo.logoDataUrl ? ' • Visual logo asset attached' : ''}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Optional Directives Fine-tuner */}

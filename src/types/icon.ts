@@ -50,6 +50,16 @@ export interface ColorPreset {
   bgHex: string;
 }
 
+export type BrandLogoMode = 'motif' | 'adaptation' | 'silhouette';
+
+export interface BrandLogoConfig {
+  logoDataUrl?: string; // base64 or object URL of uploaded logo
+  logoMimeType?: string; // image/png, image/jpeg, etc.
+  fileName?: string;
+  companyName?: string; // e.g. "FinPulse"
+  mode: BrandLogoMode; // 'motif' | 'adaptation' | 'silhouette'
+}
+
 export interface IconConfig {
   category: CategoryId;
   customSubject: string;
@@ -60,6 +70,7 @@ export interface IconConfig {
   platformMask: PlatformMask;
   customDirectives: string;
   engine: 'gemini' | 'dall-e-3' | 'microsoft-foundry';
+  brandLogo?: BrandLogoConfig;
   geminiApiKey?: string;
   openaiApiKey?: string;
   azureFoundryApiKey?: string;

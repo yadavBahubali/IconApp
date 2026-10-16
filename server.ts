@@ -29,6 +29,17 @@ if (apiKey) {
   });
 }
 
+// Health check endpoint for /api/generate-icon
+app.get('/api/generate-icon', (_req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'App Icon Studio Generator API (Local/Express Server)',
+    author: 'Developed by Kuldeep Yadav',
+    usage: 'Send a POST request with { prompt, engine, ... } to generate icons',
+    supportedEngines: ['gemini', 'microsoft-foundry', 'dall-e-3'],
+  });
+});
+
 // Generate icon API endpoint
 app.post('/api/generate-icon', async (req, res) => {
   try {
@@ -40,6 +51,7 @@ app.post('/api/generate-icon', async (req, res) => {
       azureFoundryApiKey = '',
       azureFoundryEndpoint = '',
       azureDeployment = 'dall-e-3',
+      logoDataUrl = '',
     } = req.body;
 
     if (!prompt || typeof prompt !== 'string') {
@@ -179,19 +191,55 @@ app.post('/api/generate-icon', async (req, res) => {
       httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
     });
 
+    // Prepare content parts for Gemini (supports multimodal brand logo reference)
+    const contentParts: any[] = [];
+    if (logoDataUrl && typeof logoDataUrl === 'string' && logoDataUrl.startsWith('data:image/')) {
+      const match = logoDataUrl.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+      if (match) {
+        contentParts.push({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2],
+          },
+        });
+      }
+    }
+    contentParts.push({ text: prompt });
+
     // Generate image using Gemini image generation model
     try {
-      const response = await clientToUse.models.generateContent({
-        model: 'gemini-3.1-flash-lite-image',
-        contents: {
-          parts: [{ text: prompt }],
-        },
-        config: {
-          imageConfig: {
-            aspectRatio: '1:1',
+      let response;
+      try {
+        response = await clientToUse.models.generateContent({
+          model: 'gemini-3.1-flash-lite-image',
+          contents: {
+            parts: contentParts,
           },
-        },
-      });
+          config: {
+            imageConfig: {
+              aspectRatio: '1:1',
+            },
+          },
+        });
+      } catch (multiModalErr) {
+        // If logo image part fails (e.g. unsupported SVG/size), fallback to text-only generation
+        if (contentParts.length > 1) {
+          console.warn('Multimodal logo reference failed, falling back to text prompt:', multiModalErr);
+          response = await clientToUse.models.generateContent({
+            model: 'gemini-3.1-flash-lite-image',
+            contents: {
+              parts: [{ text: prompt }],
+            },
+            config: {
+              imageConfig: {
+                aspectRatio: '1:1',
+              },
+            },
+          });
+        } else {
+          throw multiModalErr;
+        }
+      }
 
       const parts = response.candidates?.[0]?.content?.parts || [];
       for (const part of parts) {

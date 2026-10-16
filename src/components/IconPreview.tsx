@@ -13,6 +13,7 @@ import {
   Eye,
   Loader2,
   AlertCircle,
+  Building2,
 } from 'lucide-react';
 import { GeneratedIcon, IconConfig, PlatformMask } from '../types/icon';
 import { triggerFileDownload } from '../utils/zipExporter';
@@ -45,6 +46,7 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [showCheckerboard, setShowCheckerboard] = useState<boolean>(true);
   const [copiedDataUrl, setCopiedDataUrl] = useState<boolean>(false);
+  const [showBrandComparison, setShowBrandComparison] = useState<boolean>(false);
 
   // Mask CSS radius calculation
   const getMaskClass = (mask: PlatformMask) => {
@@ -91,6 +93,23 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
 
         {/* Viewport Tools */}
         <div className="flex items-center gap-1.5">
+          {config.brandLogo?.logoDataUrl && (
+            <button
+              type="button"
+              onClick={() => setShowBrandComparison(!showBrandComparison)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+                showBrandComparison
+                  ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
+                  : 'bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700'
+              }`}
+              title="Compare with uploaded brand logo side-by-side"
+            >
+              <Building2 className="w-3.5 h-3.5 text-orange-400" />
+              <span className="hidden sm:inline">Compare with Logo</span>
+              <span className="sm:hidden">Logo</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setShowCheckerboard(!showCheckerboard)}
@@ -150,31 +169,81 @@ export const IconPreview: React.FC<IconPreviewProps> = ({
           style={{ transform: `scale(${zoomLevel})` }}
         >
           {activeIcon?.imageUrl ? (
-            <div className="relative group">
-              {/* Outer Shadow for 3D elevation */}
-              <div
-                className={`w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 overflow-hidden shadow-2xl transition-all duration-300 relative border border-white/10 ${getMaskClass(
-                  config.platformMask
-                )}`}
-                style={{
-                  boxShadow: `0 25px 50px -12px ${config.primaryColor}33, 0 12px 24px -8px rgba(0,0,0,0.5)`,
-                }}
-              >
-                <img
-                  src={activeIcon.imageUrl}
-                  alt={activeIcon.name}
-                  className="w-full h-full object-cover select-none pointer-events-none"
-                />
+            showBrandComparison && config.brandLogo?.logoDataUrl ? (
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 bg-slate-950/70 p-4 sm:p-6 rounded-3xl border border-slate-800 shadow-2xl">
+                {/* Brand Logo Source */}
+                <div className="flex flex-col items-center">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl bg-[linear-gradient(45deg,#1e293b_25%,transparent_25%),linear-gradient(-45deg,#1e293b_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1e293b_75%),linear-gradient(-45deg,transparent_75%,#1e293b_75%)] bg-[size:10px_10px] bg-slate-900 border border-slate-700 p-3 flex items-center justify-center shadow-lg">
+                    <img
+                      src={config.brandLogo.logoDataUrl}
+                      alt="Original Brand Logo"
+                      className="max-h-full max-w-full object-contain filter drop-shadow"
+                    />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-300 mt-2 flex items-center gap-1">
+                    <Building2 className="w-3 h-3 text-orange-400" />
+                    <span>{config.brandLogo.companyName || 'Brand Logo'}</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500">Source Asset</span>
+                </div>
 
-                {/* Glass reflection sheen on hover */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/15 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none duration-500" />
-              </div>
+                {/* Arrow indicator */}
+                <div className="w-7 h-7 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center text-xs font-bold sm:rotate-0 rotate-90">
+                  →
+                </div>
 
-              {/* Floating resolution tag */}
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[10px] font-mono text-slate-300 shadow-md whitespace-nowrap">
-                {config.platformMask.toUpperCase()} MASK
+                {/* Synthesized App Icon */}
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-32 h-32 sm:w-40 sm:h-40 overflow-hidden shadow-2xl border border-white/10 ${getMaskClass(
+                      config.platformMask
+                    )}`}
+                    style={{
+                      boxShadow: `0 20px 40px -10px ${config.primaryColor}33`,
+                    }}
+                  >
+                    <img
+                      src={activeIcon.imageUrl}
+                      alt={activeIcon.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="text-[11px] font-bold text-orange-400 mt-2 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-orange-400" />
+                    <span>App Store Icon</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    {config.platformMask.toUpperCase()} Mask
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="relative group">
+                {/* Outer Shadow for 3D elevation */}
+                <div
+                  className={`w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 overflow-hidden shadow-2xl transition-all duration-300 relative border border-white/10 ${getMaskClass(
+                    config.platformMask
+                  )}`}
+                  style={{
+                    boxShadow: `0 25px 50px -12px ${config.primaryColor}33, 0 12px 24px -8px rgba(0,0,0,0.5)`,
+                  }}
+                >
+                  <img
+                    src={activeIcon.imageUrl}
+                    alt={activeIcon.name}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                  />
+
+                  {/* Glass reflection sheen on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/15 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none duration-500" />
+                </div>
+
+                {/* Floating resolution tag */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[10px] font-mono text-slate-300 shadow-md whitespace-nowrap">
+                  {config.platformMask.toUpperCase()} MASK
+                </div>
+              </div>
+            )
           ) : (
             <div className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 rounded-3xl border-2 border-dashed border-slate-800 flex flex-col items-center justify-center text-center p-4 sm:p-6 text-slate-500">
               <Layers className="w-10 h-10 sm:w-12 sm:h-12 mb-3 text-slate-600 animate-pulse" />

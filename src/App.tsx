@@ -8,6 +8,7 @@ import { Header } from './components/Header';
 import { CategoryPicker } from './components/CategoryPicker';
 import { StyleSelector } from './components/StyleSelector';
 import { ColorPicker } from './components/ColorPicker';
+import { BrandLogoUploader } from './components/BrandLogoUploader';
 import { PromptInspector } from './components/PromptInspector';
 import { IconPreview } from './components/IconPreview';
 import { MockupShowcase } from './components/MockupShowcase';
@@ -112,7 +113,9 @@ export default function App() {
     setMobileTab('preview');
 
     const secretPrompt = buildSecretPrompt(config);
-    const appName = config.customSubject
+    const appName = config.brandLogo?.companyName?.trim()
+      ? config.brandLogo.companyName.trim()
+      : config.customSubject
       ? config.customSubject.split(' ')[0]
       : 'AppIcon';
 
@@ -128,13 +131,26 @@ export default function App() {
           azureFoundryApiKey: config.azureFoundryApiKey,
           azureFoundryEndpoint: config.azureFoundryEndpoint,
           azureDeployment: config.azureDeployment,
+          logoDataUrl: config.brandLogo?.logoDataUrl,
         }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await response.json().catch(() => ({}));
+      } else {
+        const text = await response.text().catch(() => '');
+        data = { error: text || `HTTP ${response.status}: ${response.statusText}` };
+      }
 
       if (!response.ok || !data.success || !data.imageUrl) {
-        throw new Error(data.error || 'Failed to synthesize icon with AI model.');
+        if (response.status === 405) {
+          throw new Error(
+            '405 Method Not Allowed: Vercel rejected the POST request because api/generate-icon.ts was not yet committed/deployed. Push the latest commit to GitHub so Vercel builds the serverless function!'
+          );
+        }
+        throw new Error(data.error || `Failed to synthesize icon with AI model (HTTP ${response.status}).`);
       }
 
       // Sanitize config before adding to history (never store keys in history / localStorage)
@@ -369,6 +385,14 @@ export default function App() {
             {/* Step 1: Category & Subject */}
             <div className="p-4 sm:p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
               <CategoryPicker
+                config={config}
+                onChangeConfig={handleUpdateConfig}
+              />
+            </div>
+
+            {/* Company & Brand Logo Conditioning */}
+            <div className="p-4 sm:p-6 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md">
+              <BrandLogoUploader
                 config={config}
                 onChangeConfig={handleUpdateConfig}
               />

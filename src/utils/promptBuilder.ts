@@ -210,8 +210,33 @@ export function buildSecretPrompt(config: IconConfig): string {
   // Custom directives
   const customClause = config.customDirectives.trim() ? `, ${config.customDirectives.trim()}` : '';
 
+  // Brand and company logo directives
+  let brandClause = '';
+  if (config.brandLogo) {
+    const { companyName, logoDataUrl, mode } = config.brandLogo;
+    const parts: string[] = [];
+
+    if (companyName && companyName.trim()) {
+      parts.push(`for brand and company "${companyName.trim()}"`);
+    }
+
+    if (logoDataUrl) {
+      if (mode === 'motif') {
+        parts.push('incorporating the company brand logo as the central iconic emblem and primary design motif');
+      } else if (mode === 'adaptation') {
+        parts.push('faithfully translating the uploaded company brand logo aesthetic into a unified tactile app icon');
+      } else {
+        parts.push('stylized in the distinctive geometric silhouette and brand hallmarks of the company logo');
+      }
+    }
+
+    if (parts.length > 0) {
+      brandClause = `, ${parts.join(', ')}`;
+    }
+  }
+
   // Compose prompt
-  const secretPrompt = `A ${selectedStyle.aestheticPrompt} of ${subject}, ${colorClause}, ${bgClause}, ${platformClause}, ${selectedStyle.lightingPrompt}${customClause}, ${qualityClause}.`;
+  const secretPrompt = `A ${selectedStyle.aestheticPrompt} of ${subject}${brandClause}, ${colorClause}, ${bgClause}, ${platformClause}, ${selectedStyle.lightingPrompt}${customClause}, ${qualityClause}.`;
 
   return secretPrompt;
 }

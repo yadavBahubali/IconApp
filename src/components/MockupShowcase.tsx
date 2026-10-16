@@ -30,7 +30,9 @@ type MockupTab = 'ios' | 'android' | 'macos' | 'appstore' | 'browser';
 export const MockupShowcase: React.FC<MockupShowcaseProps> = ({ activeIcon, config }) => {
   const [activeTab, setActiveTab] = useState<MockupTab>('ios');
 
-  const appName = config.customSubject
+  const appName = config.brandLogo?.companyName?.trim()
+    ? config.brandLogo.companyName.trim()
+    : config.customSubject
     ? config.customSubject.split(' ')[0] + 'App'
     : 'StudioApp';
 
